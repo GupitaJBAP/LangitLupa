@@ -2,20 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Langit–Lupa (Responsive)</title>
+<title>Langit–Lupa (Responsive Mobile/Tablet)</title>
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
 <style>
 html, body { margin:0; padding:0; height:100%; font-family:'Pixelify Sans', sans-serif; overflow:hidden; }
 body { display:flex; justify-content:center; align-items:center; background:#aed581; }
 canvas { border:3px solid #333; border-radius:10px; image-rendering:pixelated; max-width:100%; max-height:100%; }
+
 .overlay { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; flex-direction:column; background:rgba(0,0,0,0.7); color:#fff; font-size:2vw; text-align:center; }
 button { padding:0.8vw 1.5vw; margin:0.5vw; border:none; border-radius:8px; cursor:pointer; background:#2ecc71; color:#fff; font-size:1.5vw; }
 input { padding:0.5vw; margin:0.5vw; font-size:1.5vw; }
-#scoreboard { position:absolute; top:1vw; left:1vw; background:rgba(0,0,0,0.7); color:#fff; padding:1vw 1.5vw; border-radius:1vw; font-size:1.5vw; text-align:left; }
-#pauseBtn { position:absolute; top:1vw; right:1vw; background:#e67e22; font-family:'Pixelify Sans',sans-serif; font-size:1.5vw; padding:0.8vw 1.5vw; border:none; border-radius:1vw; cursor:pointer; }
+
+#scoreboard { position:absolute; top:1vw; left:1vw; background:rgba(0,0,0,0.7); color:#fff; padding:1vw 1.5vw; border-radius:1vw; font-size:1.5vw; text-align:left; display:none; }
+#pauseBtn { position:absolute; top:1vw; right:1vw; background:#e67e22; font-family:'Pixelify Sans',sans-serif; font-size:1.5vw; padding:0.8vw 1.5vw; border:none; border-radius:1vw; cursor:pointer; display:none; }
+
 #countdownOverlay { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; font-size:8vw; font-weight:bold; color:#fff; background:rgba(0,0,0,0.7); z-index:10; display:none; }
 #gameOverScreen { width:80vw; max-width:400px; height:90vh; max-height:700px; top:50%; left:50%; transform:translate(-50%,-50%); position:absolute; display:none; justify-content:center; align-items:center; z-index:5; pointer-events:all; }
 #gameOverScreen .gameOverContainer { width:60%; height:auto; background:rgba(0,0,0,0.8); padding:2vw; border-radius:2vw; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-size:2vw; }
+
 #touchControls, #touchControls2P { position:absolute; inset:0; display:none; pointer-events:none; }
 .joystick { position:absolute; bottom:10%; width:20vw; max-width:120px; height:20vw; max-height:120px; border-radius:50%; background:rgba(0,0,0,0.3); touch-action:none; }
 .stick { position:absolute; width:40%; height:40%; border-radius:50%; background:rgba(255,255,255,0.6); top:30%; left:30%; }
@@ -44,25 +48,29 @@ input { padding:0.5vw; margin:0.5vw; font-size:1.5vw; }
 </div>
 
 <!-- Scoreboard -->
-<div id="scoreboard" style="display:none;"></div>
-<button id="pauseBtn" style="display:none;" onclick="togglePause()">Pause (P)</button>
+<div id="scoreboard"></div>
+<button id="pauseBtn" onclick="togglePause()">Pause (P)</button>
 
 <!-- Game Over Screen -->
 <div id="gameOverScreen">
   <div class="gameOverContainer"></div>
 </div>
 
-<!-- Touch Controls -->
+<!-- 1P Touch Controls -->
 <div id="touchControls">
-  <div id="joystick" class="joystick"><div id="stick" class="stick"></div></div>
-  <div id="actionBtn"></div>
+  <div id="joystick" class="joystick">
+    <div id="stick" class="stick"></div>
+  </div>
 </div>
 
+<!-- 2P Touch Controls -->
 <div id="touchControls2P">
-  <div id="joystick1" class="joystick" style="left:5%;"></div>
-  <div id="stick1" class="stick"></div>
-  <div id="joystick2" class="joystick" style="right:5%;"></div>
-  <div id="stick2" class="stick"></div>
+  <div id="joystick1" class="joystick" style="left:5%;">
+    <div id="stick1" class="stick"></div>
+  </div>
+  <div id="joystick2" class="joystick" style="right:5%;">
+    <div id="stick2" class="stick"></div>
+  </div>
 </div>
 
 <script>
@@ -99,7 +107,11 @@ window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
 // --- UI ---
-function showModeSelect(){ document.getElementById("homeScreen").style.display="none"; document.getElementById("modeScreen").style.display="flex"; }
+function showModeSelect(){ 
+  document.getElementById("homeScreen").style.display="none"; 
+  document.getElementById("modeScreen").style.display="flex"; 
+}
+
 function setupGame(numPlayers){
   mode=numPlayers; lastMode=numPlayers;
   const container=document.getElementById("nameInputs"); container.innerHTML="";
@@ -121,9 +133,9 @@ function startCountdown(){
 }
 
 // --- Collision ---
-function checkCollision(a,b,isTagger){
-  const aW=(isTagger?taggerImg.width/TAGGER_FRAMES:playerImg.width/PLAYER_FRAMES)*SCALE;
-  const aH=(isTagger?taggerImg.height:playerImg.height)*SCALE;
+function checkCollision(a,b){
+  const aW=(a.isTaya?taggerImg.width/TAGGER_FRAMES:playerImg.width/PLAYER_FRAMES)*SCALE;
+  const aH=(a.isTaya?taggerImg.height:playerImg.height)*SCALE;
   const bW=(b.isTaya?taggerImg.width/TAGGER_FRAMES:playerImg.width/PLAYER_FRAMES)*SCALE;
   const bH=(b.isTaya?taggerImg.height:playerImg.height)*SCALE;
   return a.x<a.x+bW && a.x+aW>b.x && a.y<b.y+bH && a.y+aH>b.y;
@@ -151,6 +163,7 @@ function startGame(){
 
   document.getElementById("modeScreen").style.display="none";
   document.getElementById("scoreboard").style.display="block";
+  showMobileControls();
   gameRunning=true;
   requestAnimationFrame(gameLoop);
 }
@@ -168,7 +181,7 @@ function randomizePlatforms(){
   }
 }
 
-// --- Movement & input ---
+// --- Movement & Input ---
 const keys={}; const speed=3;
 document.addEventListener("keydown",e=>{ keys[e.code]=true; if(!gameRunning && document.getElementById("gameOverScreen").style.display==="flex"){ if(e.code==="KeyR") replayGame(); if(e.code==="KeyN") newPlayer(); } if(e.code==="KeyP" && gameRunning) togglePause(); if(mode===2 && e.code==="KeyE"){ const winner=players[0].survived>players[1].survived?players[0]:players[1]; gameOver("Game ended by players.",winner.name); } });
 document.addEventListener("keyup",e=>keys[e.code]=false);
@@ -185,7 +198,7 @@ function movePlayers(){
   });
 }
 
-// --- Platform check ---
+// --- Platform Check ---
 function isOnPlatform(p){ const frameW=playerImg.width/PLAYER_FRAMES; const frameH=playerImg.height;
   return platforms.some(pl=>p.x+frameW*SCALE>pl.x && p.x<pl.x+pl.w && p.y+frameH*SCALE>pl.y && p.y+frameH*SCALE<pl.y+pl.h);
 }
@@ -200,12 +213,12 @@ function update(){
 
   if(mode===1 && npc){
     let p=players[0]; playerMoved=p.moving||playerMoved;
-    if(!isOnPlatform(p)){ if(p.x<npc.x)npc.x-=2; if(p.x>npc.x)npc.x+=2; if(p.y<npc.y)npc.y-=2; if(p.y>npc.y)npc.y+=2; npc.frame=(npc.frame+0.25)%TAGGER_FRAMES; if(checkCollision(p,npc,false)) gameOver(`${p.name} got tagged! Survived ${(timeSurvived/60).toFixed(1)} seconds.`); }
+    if(!isOnPlatform(p)){ if(p.x<npc.x)npc.x-=2; if(p.x>npc.x)npc.x+=2; if(p.y<npc.y)npc.y-=2; if(p.y>npc.y)npc.y+=2; npc.frame=(npc.frame+0.25)%TAGGER_FRAMES; if(checkCollision(p,npc)) gameOver(`${p.name} got tagged! Survived ${(timeSurvived/60).toFixed(1)} seconds.`); }
     timeSurvived++;
   } else if(mode===2){
     let p1=players[0],p2=players[1];
     if(!p1.isTaya)p1.survived++; if(!p2.isTaya)p2.survived++;
-    if(checkCollision(p1,p2,false)){ if(p1.isTaya && !isOnPlatform(p2)){p1.isTaya=false;p2.isTaya=true;} else if(p2.isTaya && !isOnPlatform(p1)){p2.isTaya=false;p1.isTaya=true;} }
+    if(checkCollision(p1,p2)){ if(p1.isTaya && !isOnPlatform(p2)){p1.isTaya=false;p2.isTaya=true;} else if(p2.isTaya && !isOnPlatform(p1)){p2.isTaya=false;p1.isTaya=true;} }
   }
 
   platformTimer++; platformCountdown=Math.max(0,platformInterval-platformTimer);
@@ -218,10 +231,8 @@ function drawSprite(img,frame,frames,dx,dy,scale){ const frameW=img.width/frames
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(bgImg,0,0,canvas.width,canvas.height);
   platforms.forEach(pl=>{ const cols=4; const frameW=stoneImg.width/cols; const frameH=stoneImg.height/cols; const sx=(pl.frame%cols)*frameW; const sy=Math.floor(pl.frame/cols)*frameH; ctx.drawImage(stoneImg,sx,sy,frameW,frameH,pl.x,pl.y,pl.w,pl.h); });
-  // Draw players
   players.forEach(p=>{ drawSprite(p.isTaya?taggerImg:playerImg,p.frame,TAGGER_FRAMES,p.x,p.y,SCALE); ctx.fillStyle=p.isTaya?"red":"blue"; ctx.fillText(p.name,p.x,p.y-8); });
-  if(npc){ drawSprite(taggerImg,npc.frame,TAGGER_FRAMES,npc.x,npc.y,SCALE); ctx.fillStyle="red"; ctx.fillText("Taya",npc.x,npc.y-8);}
-  // Scoreboard
+  if(npc){ drawSprite(taggerImg,npc.frame,TAGGER_FRAMES,npc.x,npc.y,SCALE); ctx.fillStyle="red"; ctx.fillText("Taya",npc.x,npc.y-8); }
   if(mode===1) document.getElementById("scoreboard").innerHTML=`Time: ${(timeSurvived/60).toFixed(1)}s`;
   else { let html=""; players.forEach(p=>html+=`${p.name}: ${(p.survived/60).toFixed(1)}s ${p.isTaya?"(Taya)":""}<br>`); let winner=players.reduce((a,b)=>a.survived>b.survived?a:b); html+=`<b>Winner so far: ${winner.name}</b>`; document.getElementById("scoreboard").innerHTML=html; }
 }
@@ -240,11 +251,29 @@ function gameOver(msg,winner=""){ gameRunning=false; const container=document.qu
 // --- Mobile Detection ---
 function isMobile(){ return /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent); }
 
-// --- Mobile Controls ---
+// --- Show Joystick ---
+function showMobileControls(){
+  if(isMobile()){
+    if(mode===1) document.getElementById("touchControls").style.display="block";
+    else if(mode===2) document.getElementById("touchControls2P").style.display="block";
+  } else {
+    document.getElementById("touchControls").style.display="none";
+    document.getElementById("touchControls2P").style.display="none";
+  }
+}
+
+// --- 1P Joystick ---
 let joystick=document.getElementById("joystick"), stick=document.getElementById("stick");
 let j={active:false,startX:0,startY:0,moveX:0,moveY:0};
+
+stick.addEventListener("touchstart",e=>{ j.active=true; const t=e.touches[0]; j.startX=t.clientX; j.startY=t.clientY; });
+stick.addEventListener("touchmove",e=>{ if(!j.active)return; const t=e.touches[0]; let dx=t.clientX-j.startX; let dy=t.clientY-j.startY; const max=40; if(Math.hypot(dx,dy)>max){ const a=Math.atan2(dy,dx); dx=max*Math.cos(a); dy=max*Math.sin(a); } j.moveX=dx; j.moveY=dy; stick.style.transform=`translate(${dx}px,${dy}px)`; });
+stick.addEventListener("touchend",e=>{ j.active=false; j.moveX=0; j.moveY=0; stick.style.transform="translate(0,0)"; });
+
 function handleMobileMovement(){
-  if(players[0]){ players[0].x+=j.moveX*0.05; players[0].y+=j.moveY*0.05; players[0].moving=(j.moveX!==0||j.moveY!==0);
+  if(players[0]){
+    players[0].x+=j.moveX*0.05; players[0].y+=j.moveY*0.05;
+    players[0].moving=(j.moveX!==0||j.moveY!==0);
     if(players[0].x<SAFE_ZONE.x) players[0].x=SAFE_ZONE.x;
     if(players[0].y<SAFE_ZONE.y) players[0].y=SAFE_ZONE.y;
     if(players[0].x+playerImg.width/PLAYER_FRAMES*SCALE>SAFE_ZONE.x+SAFE_ZONE.width) players[0].x=SAFE_ZONE.x+SAFE_ZONE.width-playerImg.width/PLAYER_FRAMES*SCALE;
@@ -252,18 +281,14 @@ function handleMobileMovement(){
   }
 }
 
-// Joystick events
-stick.addEventListener("touchstart",e=>{ j.active=true; const t=e.touches[0]; j.startX=t.clientX; j.startY=t.clientY; });
-stick.addEventListener("touchmove",e=>{ if(!j.active)return; const t=e.touches[0]; let dx=t.clientX-j.startX; let dy=t.clientY-j.startY; const max=40; if(Math.hypot(dx,dy)>max){ const a=Math.atan2(dy,dx); dx=max*Math.cos(a); dy=max*Math.sin(a); } j.moveX=dx; j.moveY=dy; stick.style.transform=`translate(${dx}px,${dy}px)`; });
-stick.addEventListener("touchend",e=>{ j.active=false; j.moveX=0; j.moveY=0; stick.style.transform="translate(0,0)"; });
-
-// --- 2P Mobile Controls ---
+// --- 2P Joysticks ---
 let joystick1=document.getElementById("joystick1"), stick1=document.getElementById("stick1");
 let joystick2=document.getElementById("joystick2"), stick2=document.getElementById("stick2");
 let j1={active:false,startX:0,startY:0,moveX:0,moveY:0};
 let j2={active:false,startX:0,startY:0,moveX:0,moveY:0};
 
-function setupJoystick(stick,joystickObj){ stick.addEventListener("touchstart",e=>{ joystickObj.active=true; const t=e.touches[0]; joystickObj.startX=t.clientX; joystickObj.startY=t.clientY; });
+function setupJoystick(stick,joystickObj){
+  stick.addEventListener("touchstart",e=>{ joystickObj.active=true; const t=e.touches[0]; joystickObj.startX=t.clientX; joystickObj.startY=t.clientY; });
   stick.addEventListener("touchmove",e=>{ if(!joystickObj.active) return; const t=e.touches[0]; let dx=t.clientX-joystickObj.startX; let dy=t.clientY-joystickObj.startY; const max=40; if(Math.hypot(dx,dy)>max){ const a=Math.atan2(dy,dx); dx=max*Math.cos(a); dy=max*Math.sin(a);} joystickObj.moveX=dx; joystickObj.moveY=dy; stick.style.transform=`translate(${dx}px,${dy}px)`; });
   stick.addEventListener("touchend",e=>{ joystickObj.active=false; joystickObj.moveX=0; joystickObj.moveY=0; stick.style.transform=`translate(0px,0px)`; });
 }
@@ -278,7 +303,6 @@ function handleMobile2P(){
     if(p.y+playerImg.height*SCALE>SAFE_ZONE.y+SAFE_ZONE.height) p.y=SAFE_ZONE.y+SAFE_ZONE.height-playerImg.height*SCALE;
   });
 }
-
 </script>
 </body>
 </html>
