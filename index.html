@@ -2,24 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Langit–Lupa (Responsive Mobile/Tablet)</title>
+<title>Langit–Lupa (Mobile Ready)</title>
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
 <style>
-html, body { margin:0; padding:0; height:100%; font-family:'Pixelify Sans', sans-serif; overflow:hidden; }
+html, body { margin:0; padding:0; width:100%; height:100%; font-family:'Pixelify Sans', sans-serif; overflow:hidden; }
 body { display:flex; justify-content:center; align-items:center; background:#aed581; }
-canvas { border:3px solid #333; border-radius:10px; image-rendering:pixelated; max-width:100%; max-height:100%; }
-
-.overlay { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; flex-direction:column; background:rgba(0,0,0,0.7); color:#fff; font-size:2vw; text-align:center; }
+canvas { border:3px solid #333; border-radius:10px; image-rendering:pixelated; display:block; }
+.overlay { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; flex-direction:column; background:rgba(0,0,0,0.7); color:#fff; text-align:center; }
 button { padding:0.8vw 1.5vw; margin:0.5vw; border:none; border-radius:8px; cursor:pointer; background:#2ecc71; color:#fff; font-size:1.5vw; }
 input { padding:0.5vw; margin:0.5vw; font-size:1.5vw; }
-
-#scoreboard { position:absolute; top:1vw; left:1vw; background:rgba(0,0,0,0.7); color:#fff; padding:1vw 1.5vw; border-radius:1vw; font-size:1.5vw; text-align:left; display:none; }
-#pauseBtn { position:absolute; top:1vw; right:1vw; background:#e67e22; font-family:'Pixelify Sans',sans-serif; font-size:1.5vw; padding:0.8vw 1.5vw; border:none; border-radius:1vw; cursor:pointer; display:none; }
-
+#scoreboard { position:absolute; top:1vw; left:1vw; background:rgba(0,0,0,0.7); color:#fff; padding:1vw 1.5vw; border-radius:1vw; font-size:1.5vw; text-align:left; }
+#pauseBtn { position:absolute; top:1vw; right:1vw; background:#e67e22; font-family:'Pixelify Sans',sans-serif; font-size:1.5vw; padding:0.8vw 1.5vw; border:none; border-radius:1vw; cursor:pointer; }
 #countdownOverlay { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; font-size:8vw; font-weight:bold; color:#fff; background:rgba(0,0,0,0.7); z-index:10; display:none; }
 #gameOverScreen { width:80vw; max-width:400px; height:90vh; max-height:700px; top:50%; left:50%; transform:translate(-50%,-50%); position:absolute; display:none; justify-content:center; align-items:center; z-index:5; pointer-events:all; }
 #gameOverScreen .gameOverContainer { width:60%; height:auto; background:rgba(0,0,0,0.8); padding:2vw; border-radius:2vw; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-size:2vw; }
-
 #touchControls, #touchControls2P { position:absolute; inset:0; display:none; pointer-events:none; }
 .joystick { position:absolute; bottom:10%; width:20vw; max-width:120px; height:20vw; max-height:120px; border-radius:50%; background:rgba(0,0,0,0.3); touch-action:none; }
 .stick { position:absolute; width:40%; height:40%; border-radius:50%; background:rgba(255,255,255,0.6); top:30%; left:30%; }
@@ -29,16 +25,13 @@ input { padding:0.5vw; margin:0.5vw; font-size:1.5vw; }
 <body>
 <canvas id="gameCanvas"></canvas>
 
-<!-- Countdown -->
 <div id="countdownOverlay">3</div>
 
-<!-- Home Screen -->
 <div id="homeScreen" class="overlay">
   <h1>Langit–Lupa</h1>
   <button onclick="showModeSelect()">Play</button>
 </div>
 
-<!-- Mode Select -->
 <div id="modeScreen" class="overlay" style="display:none;">
   <h2>Select Mode</h2>
   <button onclick="setupGame(1)">1 Player</button>
@@ -47,30 +40,23 @@ input { padding:0.5vw; margin:0.5vw; font-size:1.5vw; }
   <button id="startBtn" onclick="startCountdown()" style="display:none;">Start</button>
 </div>
 
-<!-- Scoreboard -->
-<div id="scoreboard"></div>
-<button id="pauseBtn" onclick="togglePause()">Pause (P)</button>
+<div id="scoreboard" style="display:none;"></div>
+<button id="pauseBtn" style="display:none;" onclick="togglePause()">Pause (P)</button>
 
-<!-- Game Over Screen -->
 <div id="gameOverScreen">
   <div class="gameOverContainer"></div>
 </div>
 
-<!-- 1P Touch Controls -->
+<!-- 1P Touch -->
 <div id="touchControls">
-  <div id="joystick" class="joystick">
-    <div id="stick" class="stick"></div>
-  </div>
+  <div id="joystick" class="joystick"><div id="stick" class="stick"></div></div>
+  <div id="actionBtn"></div>
 </div>
 
-<!-- 2P Touch Controls -->
+<!-- 2P Touch -->
 <div id="touchControls2P">
-  <div id="joystick1" class="joystick" style="left:5%;">
-    <div id="stick1" class="stick"></div>
-  </div>
-  <div id="joystick2" class="joystick" style="right:5%;">
-    <div id="stick2" class="stick"></div>
-  </div>
+  <div id="joystick1" class="joystick" style="left:5%; bottom:10%;"><div id="stick1" class="stick"></div></div>
+  <div id="joystick2" class="joystick" style="right:5%; bottom:10%;"><div id="stick2" class="stick"></div></div>
 </div>
 
 <script>
@@ -80,179 +66,37 @@ ctx.font = "12px 'Pixelify Sans'";
 ctx.textAlign = "left";
 ctx.imageSmoothingEnabled = false;
 
-// --- Constants ---
-const PLAYER_FRAMES = 24, TAGGER_FRAMES = 24, STONE_FRAMES = 16;
-let SCALE = 1.5;
-let SAFE_ZONE = { x: 40, y: 80, width: 320, height: 540 };
+let SCALE=1;
+let SAFE_ZONE={x:20,y:40,width:360,height:620};
 
-// --- Images ---
-const playerImg = new Image(); playerImg.src="player.png";
-const taggerImg = new Image(); taggerImg.src="tagger.png";
-const stoneImg = new Image(); stoneImg.src="stone.png";
-const bgImg = new Image(); bgImg.src="place.png";
-
-// --- Game State ---
-let players=[], npc=null, platforms=[], gameRunning=false, paused=false, mode=1, timeSurvived=0, lastMode=1, lastNames=[], playerMoved=false, platformTimer=0, platformInterval=600, platformCountdown=600;
-
-// --- Responsive Canvas ---
 function resizeCanvas(){
-  const w = window.innerWidth*0.95, h = window.innerHeight*0.95;
-  canvas.width = Math.min(400,w);
-  canvas.height = Math.min(700,h);
-  SCALE = canvas.width/400*1.5;
-  SAFE_ZONE.width = canvas.width - 80;
-  SAFE_ZONE.height = canvas.height - 120;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const aspectRatio = 9/16;
+    let canvasWidth = vw;
+    let canvasHeight = vw / aspectRatio;
+    if(canvasHeight > vh){ canvasHeight = vh; canvasWidth = vh * aspectRatio; }
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    SCALE = canvas.width / 400;
+    SAFE_ZONE.x = 20 * SCALE;
+    SAFE_ZONE.y = 40 * SCALE;
+    SAFE_ZONE.width = canvas.width - 40*SCALE;
+    SAFE_ZONE.height = canvas.height - 80*SCALE;
+
+    // Joystick scaling
+    document.querySelectorAll(".joystick").forEach(j=>{ j.style.width=`${20*SCALE}px`; j.style.height=`${20*SCALE}px`; });
+    document.querySelectorAll(".stick").forEach(s=>{ s.style.width=`${40*SCALE}%`; s.style.height=`${40*SCALE}%`; });
+    document.getElementById("actionBtn").style.width=`${15*SCALE}vw`; document.getElementById("actionBtn").style.height=`${15*SCALE}vw`;
 }
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener("resize",resizeCanvas);
 resizeCanvas();
 
-// --- UI ---
-function showModeSelect(){ 
-  document.getElementById("homeScreen").style.display="none"; 
-  document.getElementById("modeScreen").style.display="flex"; 
-}
-
-function setupGame(numPlayers){
-  mode=numPlayers; lastMode=numPlayers;
-  const container=document.getElementById("nameInputs"); container.innerHTML="";
-  document.getElementById("startBtn").style.display="block";
-  if(numPlayers===1) container.innerHTML=`<div>Player Name: <input type="text" id="player1Name" placeholder="Player"></div>`;
-  else container.innerHTML=`<div>Player 1 Name: <input type="text" id="player1Name" placeholder="Player1"></div><div>Player 2 Name: <input type="text" id="player2Name" placeholder="Player2"></div>`;
-}
-
-// --- Countdown ---
-function startCountdown(){
-  const overlay=document.getElementById("countdownOverlay");
-  let count=3; overlay.textContent=count; overlay.style.display="flex";
-  const interval=setInterval(()=>{
-    count--;
-    if(count===0) overlay.textContent="Go!";
-    else if(count<0){ overlay.style.display="none"; clearInterval(interval); startGame(); }
-    else overlay.textContent=count;
-  },1000);
-}
-
-// --- Collision ---
-function checkCollision(a,b){
-  const aW=(a.isTaya?taggerImg.width/TAGGER_FRAMES:playerImg.width/PLAYER_FRAMES)*SCALE;
-  const aH=(a.isTaya?taggerImg.height:playerImg.height)*SCALE;
-  const bW=(b.isTaya?taggerImg.width/TAGGER_FRAMES:playerImg.width/PLAYER_FRAMES)*SCALE;
-  const bH=(b.isTaya?taggerImg.height:playerImg.height)*SCALE;
-  return a.x<a.x+bW && a.x+aW>b.x && a.y<b.y+bH && a.y+aH>b.y;
-}
-
-// --- Game Start ---
-function startGame(){
-  players=[]; npc=null; timeSurvived=0; paused=false; playerMoved=false; platformTimer=0; platformCountdown=platformInterval;
-  randomizePlatforms();
-  document.getElementById("pauseBtn").style.display="block";
-  document.getElementById("gameOverScreen").style.display="none";
-
-  if(mode===1){
-    let name1=document.getElementById("player1Name").value||"Player";
-    players.push({name:name1,x:150,y:570,isTaya:false,score:0,frame:0,moving:false});
-    npc={x:250,y:570,isTaya:true,frame:0};
-    lastNames=[name1];
-  } else {
-    let name1=document.getElementById("player1Name").value||"Player1";
-    let name2=document.getElementById("player2Name").value||"Player2";
-    players.push({name:name1,x:120,y:570,isTaya:false,score:0,frame:0,moving:false,survived:0});
-    players.push({name:name2,x:260,y:570,isTaya:true,score:0,frame:0,moving:false,survived:0});
-    lastNames=[name1,name2];
-  }
-
-  document.getElementById("modeScreen").style.display="none";
-  document.getElementById("scoreboard").style.display="block";
-  showMobileControls();
-  gameRunning=true;
-  requestAnimationFrame(gameLoop);
-}
-
-// --- Platform Randomization ---
-function randomizePlatforms(){
-  platforms=[]; const maxAttempts=100;
-  for(let i=0;i<5;i++){
-    let newPlat=null,safe=false,attempts=0;
-    while(!safe&&attempts<maxAttempts){
-      newPlat={x:SAFE_ZONE.x+Math.floor(Math.random()*(SAFE_ZONE.width-80)),y:SAFE_ZONE.y+Math.floor(Math.random()*(SAFE_ZONE.height-40)),w:80,h:40,frame:Math.floor(Math.random()*STONE_FRAMES)};
-      safe=platforms.every(pl=>Math.abs(pl.x-newPlat.x)>60 && Math.abs(pl.y-newPlat.y)>60); attempts++;
-    }
-    if(newPlat) platforms.push(newPlat);
-  }
-}
-
-// --- Movement & Input ---
-const keys={}; const speed=3;
-document.addEventListener("keydown",e=>{ keys[e.code]=true; if(!gameRunning && document.getElementById("gameOverScreen").style.display==="flex"){ if(e.code==="KeyR") replayGame(); if(e.code==="KeyN") newPlayer(); } if(e.code==="KeyP" && gameRunning) togglePause(); if(mode===2 && e.code==="KeyE"){ const winner=players[0].survived>players[1].survived?players[0]:players[1]; gameOver("Game ended by players.",winner.name); } });
-document.addEventListener("keyup",e=>keys[e.code]=false);
-
-function movePlayers(){
-  players.forEach(p=>{
-    p.moving=false;
-    if(p===players[0]){ if(keys["KeyA"]){p.x-=speed;p.moving=true;} if(keys["KeyD"]){p.x+=speed;p.moving=true;} if(keys["KeyW"]){p.y-=speed;p.moving=true;} if(keys["KeyS"]){p.y+=speed;p.moving=true;} }
-    if(mode===2 && p===players[1]){ if(keys["ArrowLeft"]){p.x-=speed;p.moving=true;} if(keys["ArrowRight"]){p.x+=speed;p.moving=true;} if(keys["ArrowUp"]){p.y-=speed;p.moving=true;} if(keys["ArrowDown"]){p.y+=speed;p.moving=true;} }
-    const frameW=playerImg.width/PLAYER_FRAMES, frameH=playerImg.height;
-    if(p.x<SAFE_ZONE.x)p.x=SAFE_ZONE.x; if(p.y<SAFE_ZONE.y)p.y=SAFE_ZONE.y;
-    if(p.x+frameW*SCALE>SAFE_ZONE.x+SAFE_ZONE.width)p.x=SAFE_ZONE.x+SAFE_ZONE.width-frameW*SCALE;
-    if(p.y+frameH*SCALE>SAFE_ZONE.y+SAFE_ZONE.height)p.y=SAFE_ZONE.y+SAFE_ZONE.height-frameH*SCALE;
-  });
-}
-
-// --- Platform Check ---
-function isOnPlatform(p){ const frameW=playerImg.width/PLAYER_FRAMES; const frameH=playerImg.height;
-  return platforms.some(pl=>p.x+frameW*SCALE>pl.x && p.x<pl.x+pl.w && p.y+frameH*SCALE>pl.y && p.y+frameH*SCALE<pl.y+pl.h);
-}
-
-// --- NPC & Update ---
-function update(){
-  if(isMobile() && mode===1) handleMobileMovement();
-  else if(isMobile() && mode===2) handleMobile2P();
-  else movePlayers();
-
-  players.forEach(p=>{ if(p.moving)p.frame=(p.frame+0.25)%PLAYER_FRAMES; else p.frame=0; });
-
-  if(mode===1 && npc){
-    let p=players[0]; playerMoved=p.moving||playerMoved;
-    if(!isOnPlatform(p)){ if(p.x<npc.x)npc.x-=2; if(p.x>npc.x)npc.x+=2; if(p.y<npc.y)npc.y-=2; if(p.y>npc.y)npc.y+=2; npc.frame=(npc.frame+0.25)%TAGGER_FRAMES; if(checkCollision(p,npc)) gameOver(`${p.name} got tagged! Survived ${(timeSurvived/60).toFixed(1)} seconds.`); }
-    timeSurvived++;
-  } else if(mode===2){
-    let p1=players[0],p2=players[1];
-    if(!p1.isTaya)p1.survived++; if(!p2.isTaya)p2.survived++;
-    if(checkCollision(p1,p2)){ if(p1.isTaya && !isOnPlatform(p2)){p1.isTaya=false;p2.isTaya=true;} else if(p2.isTaya && !isOnPlatform(p1)){p2.isTaya=false;p1.isTaya=true;} }
-  }
-
-  platformTimer++; platformCountdown=Math.max(0,platformInterval-platformTimer);
-  if(platformTimer>=platformInterval){ randomizePlatforms(); platformTimer=0; platformInterval=Math.max(120,platformInterval-60); platformCountdown=platformInterval; }
-}
-
-// --- Drawing ---
-function drawSprite(img,frame,frames,dx,dy,scale){ const frameW=img.width/frames; const frameH=img.height; ctx.drawImage(img,Math.floor(frame)*frameW,0,frameW,frameH,dx,dy,frameW*scale,frameH*scale); }
-
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(bgImg,0,0,canvas.width,canvas.height);
-  platforms.forEach(pl=>{ const cols=4; const frameW=stoneImg.width/cols; const frameH=stoneImg.height/cols; const sx=(pl.frame%cols)*frameW; const sy=Math.floor(pl.frame/cols)*frameH; ctx.drawImage(stoneImg,sx,sy,frameW,frameH,pl.x,pl.y,pl.w,pl.h); });
-  players.forEach(p=>{ drawSprite(p.isTaya?taggerImg:playerImg,p.frame,TAGGER_FRAMES,p.x,p.y,SCALE); ctx.fillStyle=p.isTaya?"red":"blue"; ctx.fillText(p.name,p.x,p.y-8); });
-  if(npc){ drawSprite(taggerImg,npc.frame,TAGGER_FRAMES,npc.x,npc.y,SCALE); ctx.fillStyle="red"; ctx.fillText("Taya",npc.x,npc.y-8); }
-  if(mode===1) document.getElementById("scoreboard").innerHTML=`Time: ${(timeSurvived/60).toFixed(1)}s`;
-  else { let html=""; players.forEach(p=>html+=`${p.name}: ${(p.survived/60).toFixed(1)}s ${p.isTaya?"(Taya)":""}<br>`); let winner=players.reduce((a,b)=>a.survived>b.survived?a:b); html+=`<b>Winner so far: ${winner.name}</b>`; document.getElementById("scoreboard").innerHTML=html; }
-}
-
-// --- Game Loop ---
-function gameLoop(){ if(gameRunning && !paused){ update(); draw(); requestAnimationFrame(gameLoop); } }
-
-// --- Pause, Replay, New Player ---
-function togglePause(){ paused=!paused; document.getElementById("pauseBtn").textContent=paused?"Resume (P)":"Pause (P)"; if(!paused) requestAnimationFrame(gameLoop); }
-function replayGame(){ startGame(); }
-function newPlayer(){ document.getElementById("gameOverScreen").style.display="none"; showModeSelect(); setupGame(lastMode); }
-
-// --- Game Over ---
-function gameOver(msg,winner=""){ gameRunning=false; const container=document.querySelector("#gameOverScreen .gameOverContainer"); container.innerHTML=`<h2>Game Over</h2><p>${msg}</p>`; if(winner) container.innerHTML+=`<p>Winner: ${winner}</p>`; container.innerHTML+=`<button onclick="replayGame()">Replay</button><button onclick="newPlayer()">New Player</button>`; document.getElementById("gameOverScreen").style.display="flex"; document.getElementById("pauseBtn").style.display="none"; }
-
-// --- Mobile Detection ---
+// --- Detect Mobile ---
 function isMobile(){ return /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent); }
-
-// --- Show Joystick ---
-function showMobileControls(){
+function updateTouchVisibility(){
   if(isMobile()){
     if(mode===1) document.getElementById("touchControls").style.display="block";
     else if(mode===2) document.getElementById("touchControls2P").style.display="block";
@@ -262,47 +106,22 @@ function showMobileControls(){
   }
 }
 
-// --- 1P Joystick ---
+// --- Joystick setup ---
 let joystick=document.getElementById("joystick"), stick=document.getElementById("stick");
 let j={active:false,startX:0,startY:0,moveX:0,moveY:0};
-
 stick.addEventListener("touchstart",e=>{ j.active=true; const t=e.touches[0]; j.startX=t.clientX; j.startY=t.clientY; });
-stick.addEventListener("touchmove",e=>{ if(!j.active)return; const t=e.touches[0]; let dx=t.clientX-j.startX; let dy=t.clientY-j.startY; const max=40; if(Math.hypot(dx,dy)>max){ const a=Math.atan2(dy,dx); dx=max*Math.cos(a); dy=max*Math.sin(a); } j.moveX=dx; j.moveY=dy; stick.style.transform=`translate(${dx}px,${dy}px)`; });
+stick.addEventListener("touchmove",e=>{ if(!j.active)return; const t=e.touches[0]; let dx=t.clientX-j.startX; let dy=t.clientY-j.startY; const max=40; if(Math.hypot(dx,dy)>max){ const a=Math.atan2(dy,dx); dx=max*Math.cos(a); dy=max*Math.sin(a);} j.moveX=dx; j.moveY=dy; stick.style.transform=`translate(${dx}px,${dy}px)`; });
 stick.addEventListener("touchend",e=>{ j.active=false; j.moveX=0; j.moveY=0; stick.style.transform="translate(0,0)"; });
 
-function handleMobileMovement(){
-  if(players[0]){
-    players[0].x+=j.moveX*0.05; players[0].y+=j.moveY*0.05;
-    players[0].moving=(j.moveX!==0||j.moveY!==0);
-    if(players[0].x<SAFE_ZONE.x) players[0].x=SAFE_ZONE.x;
-    if(players[0].y<SAFE_ZONE.y) players[0].y=SAFE_ZONE.y;
-    if(players[0].x+playerImg.width/PLAYER_FRAMES*SCALE>SAFE_ZONE.x+SAFE_ZONE.width) players[0].x=SAFE_ZONE.x+SAFE_ZONE.width-playerImg.width/PLAYER_FRAMES*SCALE;
-    if(players[0].y+playerImg.height*SCALE>SAFE_ZONE.y+SAFE_ZONE.height) players[0].y=SAFE_ZONE.y+SAFE_ZONE.height-playerImg.height*SCALE;
-  }
-}
-
-// --- 2P Joysticks ---
-let joystick1=document.getElementById("joystick1"), stick1=document.getElementById("stick1");
-let joystick2=document.getElementById("joystick2"), stick2=document.getElementById("stick2");
-let j1={active:false,startX:0,startY:0,moveX:0,moveY:0};
-let j2={active:false,startX:0,startY:0,moveX:0,moveY:0};
-
-function setupJoystick(stick,joystickObj){
+// 2P Joysticks
+let stick1=document.getElementById("stick1"), stick2=document.getElementById("stick2");
+let j1={active:false,startX:0,startY:0,moveX:0,moveY:0}; let j2={active:false,startX:0,startY:0,moveX:0,moveY:0};
+function setupJoystick(stick,joystickObj){ 
   stick.addEventListener("touchstart",e=>{ joystickObj.active=true; const t=e.touches[0]; joystickObj.startX=t.clientX; joystickObj.startY=t.clientY; });
-  stick.addEventListener("touchmove",e=>{ if(!joystickObj.active) return; const t=e.touches[0]; let dx=t.clientX-joystickObj.startX; let dy=t.clientY-joystickObj.startY; const max=40; if(Math.hypot(dx,dy)>max){ const a=Math.atan2(dy,dx); dx=max*Math.cos(a); dy=max*Math.sin(a);} joystickObj.moveX=dx; joystickObj.moveY=dy; stick.style.transform=`translate(${dx}px,${dy}px)`; });
-  stick.addEventListener("touchend",e=>{ joystickObj.active=false; joystickObj.moveX=0; joystickObj.moveY=0; stick.style.transform=`translate(0px,0px)`; });
+  stick.addEventListener("touchmove",e=>{ if(!joystickObj.active)return; const t=e.touches[0]; let dx=t.clientX-joystickObj.startX; let dy=t.clientY-joystickObj.startY; const max=40; if(Math.hypot(dx,dy)>max){ const a=Math.atan2(dy,dx); dx=max*Math.cos(a); dy=max*Math.sin(a);} joystickObj.moveX=dx; joystickObj.moveY=dy; stick.style.transform=`translate(${dx}px,${dy}px)`; });
+  stick.addEventListener("touchend",e=>{ joystickObj.active=false; joystickObj.moveX=0; joystickObj.moveY=0; stick.style.transform="translate(0px,0px)"; });
 }
 setupJoystick(stick1,j1); setupJoystick(stick2,j2);
-
-function handleMobile2P(){
-  if(players[0]){ players[0].x+=j1.moveX*0.05; players[0].y+=j1.moveY*0.05; players[0].moving=(j1.moveX!==0||j1.moveY!==0); }
-  if(players[1]){ players[1].x+=j2.moveX*0.05; players[1].y+=j2.moveY*0.05; players[1].moving=(j2.moveX!==0||j2.moveY!==0); }
-  players.forEach(p=>{
-    if(p.x<SAFE_ZONE.x) p.x=SAFE_ZONE.x; if(p.y<SAFE_ZONE.y) p.y=SAFE_ZONE.y;
-    if(p.x+playerImg.width/PLAYER_FRAMES*SCALE>SAFE_ZONE.x+SAFE_ZONE.width) p.x=SAFE_ZONE.x+SAFE_ZONE.width-playerImg.width/PLAYER_FRAMES*SCALE;
-    if(p.y+playerImg.height*SCALE>SAFE_ZONE.y+SAFE_ZONE.height) p.y=SAFE_ZONE.y+SAFE_ZONE.height-playerImg.height*SCALE;
-  });
-}
 </script>
 </body>
 </html>
